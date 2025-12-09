@@ -44,7 +44,7 @@ def get_local_ip():
     except Exception:
         return "127.0.0.1"
 
-# --- 웹소켓 매니저 (수정됨) ---
+# 웹소켓 클래스
 class ConnectionManager:
     def __init__(self):
         self.monitors: List[WebSocket] = []
@@ -72,7 +72,7 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# --- 데이터 저장 함수 ---
+# 데이터 저장 함수
 def save_data(data: dict):
     try:
         with open(CSV_FILE_PATH, mode="a", newline="", encoding="utf-8") as f:
@@ -85,7 +85,7 @@ def save_data(data: dict):
     except Exception as e:
         print(f"CSV Error: {e}")
 
-# --- 라우팅 ---
+# 라우팅
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {
