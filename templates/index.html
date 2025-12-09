@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMU Server</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f6f8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 400px; width: 90%; }
+        h1 { margin-top: 0; color: #333; }
+        .info { background: #eef; color: #446; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; word-break: break-all;}
+        .btn { display: block; width: 100%; padding: 15px 0; margin: 10px 0; border: none; border-radius: 8px; color: white; font-size: 1.1em; text-decoration: none; font-weight: bold; cursor: pointer; }
+        .btn-sensor { background: #4dabf7; }
+        .btn-monitor { background: #51cf66; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IMU Connect</h1>
+        <div class="info">
+            Server IP: https://{{ server_ip }}:{{ server_port }}
+        </div>
+        <p>역할을 선택하세요</p>
+        <a href="/mode/sensor" class="btn btn-sensor">📱 스마트폰 (센서 전송)</a>
+        <a href="/mode/monitor" class="btn btn-monitor">🖥️ PC (모니터링)</a>
+    </div>
+</body>
+</html>

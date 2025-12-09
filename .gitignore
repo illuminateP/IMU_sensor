@@ -1,0 +1,22 @@
+# 가상환경
+venv/
+env/
+.env
+
+# 파이썬 컴파일 파일
+__pycache__/
+*.py[cod]
+
+# 데이터 파일 
+data/
+*.csv
+
+# 보안 인증서 파일
+*.pem
+*.key
+*.crt
+
+# OS 및 에디터 설정 파일
+.DS_Store
+.vscode/
+.idea/

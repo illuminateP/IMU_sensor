@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sender</title>
+    <style>
+        body { font-family: monospace; background: #212529; color: #f8f9fa; padding: 20px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .box { background: #343a40; padding: 15px 5px; border-radius: 5px; }
+        .label { font-size: 0.8rem; color: #adb5bd; display: block; }
+        .val { font-size: 1.2rem; font-weight: bold; }
+        #btn { background: #fa5252; color: white; border: none; padding: 20px 40px; font-size: 1.5rem; border-radius: 50px; cursor: pointer; margin-top: 20px; }
+        #status { margin: 15px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h3>IMU Sender</h3>
+    <div id="status" style="color:yellow">Ready</div>
+    
+    <div class="grid">
+        <div class="box"><span class="label">AX</span><span id="ax" class="val">0.0</span></div>
+        <div class="box"><span class="label">AY</span><span id="ay" class="val">0.0</span></div>
+        <div class="box"><span class="label">AZ</span><span id="az" class="val">0.0</span></div>
+    </div>
+    <div class="grid">
+        <div class="box"><span class="label">GX</span><span id="gx" class="val">0.0</span></div>
+        <div class="box"><span class="label">GY</span><span id="gy" class="val">0.0</span></div>
+        <div class="box"><span class="label">GZ</span><span id="gz" class="val">0.0</span></div>
+    </div>
+
+    <button id="btn">START</button>
+
+    <script>
+        let ws;
+        document.getElementById('btn').addEventListener('click', async () => {
+            // iOS 권한 요청
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const resp = await DeviceMotionEvent.requestPermission();
+                    if (resp === 'granted') connect();
+                    else alert("Permission Denied");
+                } catch (e) { alert(e); }
+            } else {
+                connect();
+            }
+        });
+
+        function connect() {
+            // HTTPS(wss) 자동 감지
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${proto}//${window.location.host}/ws/sensor?client_id=Mobile`);
+            
+            ws.onopen = () => {
+                document.getElementById('status').innerText = "Connected";
+                document.getElementById('status').style.color = "#40c057";
+                document.getElementById('btn').style.display = 'none';
+                window.addEventListener('devicemotion', handleMotion, true);
+            };
+            ws.onclose = () => {
+                document.getElementById('status').innerText = "Disconnected";
+                document.getElementById('status').style.color = "#fa5252";
+                document.getElementById('btn').style.display = 'inline-block';
+                window.removeEventListener('devicemotion', handleMotion, true);
+            };
+        }
+
+        function handleMotion(e) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const acc = e.accelerationIncludingGravity;
+                const rot = e.rotationRate;
+                if(!acc || !rot) return;
+
+                const data = {
+                    ax: acc.x||0, ay: acc.y||0, az: acc.z||0,
+                    gx: rot.alpha||0, gy: rot.beta||0, gz: rot.gamma||0
+                };
+                ws.send(JSON.stringify(data));
+                
+                // 화면 갱신
+                ['ax','ay','az','gx','gy','gz'].forEach(k => {
+                    document.getElementById(k).innerText = data[k].toFixed(2);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

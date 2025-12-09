@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .panel { border: 1px solid #ccc; padding: 20px; max-width: 400px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h2>Live Monitor</h2>
+        <div class="row">STATUS: <span id="status">Waiting...</span></div>
+        <div class="row">TIME: <span id="time">-</span></div>
+        <hr>
+        <div class="row">AX: <span id="ax">0.00</span></div>
+        <div class="row">AY: <span id="ay">0.00</span></div>
+        <div class="row">AZ: <span id="az">0.00</span></div>
+        <br>
+        <div class="row">GX: <span id="gx">0.00</span></div>
+        <div class="row">GY: <span id="gy">0.00</span></div>
+        <div class="row">GZ: <span id="gz">0.00</span></div>
+    </div>
+    <script>
+        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${proto}//${window.location.host}/ws/monitor`);
+
+        ws.onopen = () => document.getElementById("status").innerText = "Connected";
+        ws.onmessage = (e) => {
+            const d = JSON.parse(e.data);
+            document.getElementById("time").innerText = d.timestamp;
+            ['ax','ay','az','gx','gy','gz'].forEach(k => {
+                if(d[k]) document.getElementById(k).innerText = d[k].toFixed(3);
+            });
+        };
+    </script>
+</body>
+</html>
